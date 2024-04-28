@@ -36,6 +36,3 @@ class Transformer(nn.Module):
         output_probabilities = nn.Softmax(linear_output)
 
         return output_probabilities
-
-    def predict(self, input):
-        pass
