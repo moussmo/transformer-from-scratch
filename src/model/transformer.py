@@ -4,20 +4,17 @@ from src.model.decoder import Decoder
 from src.model.embedding import Embedding
 
 class Transformer(nn.Module):
-    N_ENCODERS = 6
-    N_DECODERS = 6
-
     def __init__(self):
         self.embedding_model = Embedding()
-        self.encoder_stack = nn.Sequential(*[Encoder() for i in range(self.N_ENCODERS)])
-        self.decoder_stack = nn.Sequential(*[Decoder() for i in range(self.N_DECODERS)])
+        self.encoder_stack = nn.Sequential(*[Encoder() for i in range(6)])
+        self.decoder_stack = nn.Sequential(*[Decoder() for i in range(6)])
         self.linear_layer = nn.Linear()
 
     def _add_positional_encoding(self, sequence):
-        return 1
+        return sequence
 
     def _shift_right(self, sequence):
-        return 1
+        return sequence
 
     def forward(self, input):
         encoder_sequence, decoder_sequence = input
@@ -29,7 +26,7 @@ class Transformer(nn.Module):
 
         decoder_sequence = self.embedding_model.embed(decoder_sequence)
         decoder_sequence = self._shift_right(decoder_sequence)
-        decoder_sequence = self.add_positional_encoding(decoder_sequence)
+        decoder_sequence = self._add_positional_encoding(decoder_sequence)
         decoder_output = self.decoder_stack(decoder_sequence, K, V)     
 
         linear_output = self.linear_layer(decoder_output)
