@@ -22,12 +22,11 @@ class Transformer(nn.Module):
         encoder_sequence = self.embedding_model.embed(encoder_sequence)
         encoder_sequence = self._add_positional_encoding(encoder_sequence)
         encoder_output = self.encoder_stack(encoder_sequence)
-        K, V = encoder_output
 
         decoder_sequence = self.embedding_model.embed(decoder_sequence)
         decoder_sequence = self._shift_right(decoder_sequence)
         decoder_sequence = self._add_positional_encoding(decoder_sequence)
-        decoder_output = self.decoder_stack(decoder_sequence, K, V)     
+        decoder_output = self.decoder_stack(decoder_sequence, encoder_output)     
 
         linear_output = self.linear_layer(decoder_output)
         output_probabilities = nn.Softmax(linear_output)

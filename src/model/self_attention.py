@@ -8,10 +8,10 @@ class SelfAttention(nn.Module):
         self.W_K = nn.Linear(512, 64)
         self.W_V = nn.Linear(512, 64)
 
-    def forward(self, input, encoder_K=None, encoder_V=None):
+    def forward(self, input, encoder_output=None):
         Q = self.W_Q(input)
-        K = self.W_K(input) if encoder_K is None else encoder_K
-        V = self.W_V(input) if encoder_V is None else encoder_V
+        K = self.W_K(input) if encoder_output is None else self.W_K(encoder_output)
+        V = self.W_V(input) if encoder_output is None else self.W_V(encoder_output)
         output = torch.matmul(torch.softmax(torch.matmul(Q,torch.t(K))/8), V)
         return output
         
