@@ -1,3 +1,4 @@
+import numpy as np
 import torch.nn as nn
 from src.model.encoder import Encoder
 from src.model.decoder import Decoder
@@ -11,7 +12,16 @@ class Transformer(nn.Module):
         self.linear_layer = nn.Linear()
 
     def _add_positional_encoding(self, sequence):
-        return sequence
+        def positional_encoding_builder(_, row, column):
+            if column%2 == 0 :
+                return np.sin(row/10000**(2*column/512))
+            else:
+                return np.cos(row/10000**(2*column/512))
+        positional_encoding_builder_vectorized = np.vectorize(positional_encoding_builder)
+        positional_encoding = np.fromfunction(positional_encoding_builder_vectorized, shape=sequence.shape)
+
+        sequence_with_positionals= sequence + positional_encoding
+        return sequence_with_positionals
 
     def _shift_right(self, sequence):
         return sequence
