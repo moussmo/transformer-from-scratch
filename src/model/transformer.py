@@ -22,20 +22,26 @@ class Transformer(nn.Module):
         sequence_with_positionals= sequence + positional_encoding
         return sequence_with_positionals
 
-    def forward(self, input):
-        encoder_sequence, decoder_sequence = input
-        
+    def _encode(self, encoder_sequence):
         encoder_sequence = self.embedding_model(encoder_sequence)*np.sqrt(512)
         encoder_sequence = self._add_positional_encoding(encoder_sequence)
         encoder_sequence = fn.dropout(encoder_sequence, 0.1)
         encoder_output = self.encoder_stack(encoder_sequence)
-
+        return encoder_output
+    
+    def _decode(self, decoder_sequence, encoder_output):
         decoder_sequence = self.embedding_model.embed(decoder_sequence)
         decoder_sequence = self._shift_right(decoder_sequence)
         decoder_sequence = self._add_positional_encoding(decoder_sequence)
         decoder_output = self.decoder_stack(decoder_sequence, encoder_output)     
-
         linear_output = self.linear_layer(decoder_output)
         output_probabilities = fn.softmax(linear_output)
-
         return output_probabilities
+    
+    def forward(self, encoder_sequence, decoder_sequence):   
+        encoder_output = self._encode(encoder_sequence)
+        output_probabilities = self._decode(decoder_sequence, encoder_output)
+        return output_probabilities
+    
+    def predict(self, input_sequence):
+        return 1
