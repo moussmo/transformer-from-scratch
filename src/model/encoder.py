@@ -6,6 +6,7 @@ class Encoder(nn.Module):
         self.multihead_attention = MultiheadAttention()
         self.layer_norm = nn.LayerNorm(512)
         self.FFN = nn.Sequential(nn.Linear(512, 2048),
+                                 nn.ReLU(),
                                  nn.Linear(2048, 512))
     
     def forward(self, input):

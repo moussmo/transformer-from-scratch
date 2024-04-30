@@ -5,11 +5,11 @@ from src.model.decoder import Decoder
 from src.model.embedding import Embedding
 
 class Transformer(nn.Module):
-    def __init__(self):
-        self.embedding_model = Embedding()
+    def __init__(self, vocabulary_size_org, vocabulary_size_dst):
+        self.embedding_model = nn.Embedding(vocabulary_size_org, 512)
         self.encoder_stack = nn.Sequential(*[Encoder() for i in range(6)])
         self.decoder_stack = nn.Sequential(*[Decoder() for i in range(6)])
-        self.linear_layer = nn.Linear()
+        self.linear_layer = nn.Linear(512,vocabulary_size_dst)
 
     def _add_positional_encoding(self, sequence):
         def positional_encoding_builder(_, row, column):
@@ -19,7 +19,6 @@ class Transformer(nn.Module):
                 return np.cos(row/10000**(2*column/512))
         positional_encoding_builder_vectorized = np.vectorize(positional_encoding_builder)
         positional_encoding = np.fromfunction(positional_encoding_builder_vectorized, shape=sequence.shape)
-
         sequence_with_positionals= sequence + positional_encoding
         return sequence_with_positionals
 
@@ -29,7 +28,7 @@ class Transformer(nn.Module):
     def forward(self, input):
         encoder_sequence, decoder_sequence = input
         
-        encoder_sequence = self.embedding_model.embed(encoder_sequence)
+        encoder_sequence = self.embedding_model(encoder_sequence)*np.sqrt(512)
         encoder_sequence = self._add_positional_encoding(encoder_sequence)
         encoder_output = self.encoder_stack(encoder_sequence)
 

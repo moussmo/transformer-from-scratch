@@ -7,6 +7,7 @@ class Decoder(nn.Module):
         self.layer_norm = nn.LayerNorm(512)
         self.encoder_decoder_attention = MultiheadAttention()
         self.FFN = nn.Sequential(nn.Linear(512, 2048),
+                                 nn.ReLU(),
                                  nn.Linear(2048, 512))
         
     def forward(self, input, encoder_output):
