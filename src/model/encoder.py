@@ -1,5 +1,6 @@
 import torch.nn as nn
 from multihead_attention import MultiheadAttention
+import torch.nn.functional as fn
 
 class Encoder(nn.Module):
     def __init__(self):
@@ -11,7 +12,8 @@ class Encoder(nn.Module):
     
     def forward(self, input):
         x1 = self.multihead_attention(input)
-        x2 = self.layer_norm(x1 + input)
-        x3 = self.FFN(x2)
-        output = self.layer_norm(x3 + x2)
+        x2 = fn.dropout(x1, 0.1)
+        x3 = self.layer_norm(x2 + input)
+        x4 = self.FFN(x3)
+        output = self.layer_norm(x4 + x3)
         return output
